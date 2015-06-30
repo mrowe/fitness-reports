@@ -9,22 +9,18 @@ from geopy.distance import vincenty
 
 try:
     filename = sys.argv[1]
-    gpx_file = open(filename, 'r')
 except IndexError as e:
     print "Usage: %s: <filename>" % sys.argv[0]
     sys.exit(1)
 
-gpx = gpxpy.parse(gpx_file)
-
-def gpx2point(gpx_point):
-    return Point(gpx_point.latitude, gpx_point.longitude)
+gpx = gpxpy.parse(open(filename, 'r'))
 
 distance = 0
 
 for track in gpx.tracks:
     for segment in track.segments:
         for point in segment.points:
-            this_point = gpx2point(point)
+            this_point = Point(point.latitude, point.longitude)
             try:
                 distance += vincenty(last_point, this_point).meters
             except NameError:
