@@ -16,9 +16,12 @@ except IndexError as e:
 gpx = gpxpy.parse(open(filename, 'r'))
 
 distance = 0
+duration = 0
 
 for track in gpx.tracks:
     for segment in track.segments:
+        duration += segment.get_duration()
         distance += segment.length_2d()
 
 print "Total distance: %.1f km" % (distance / 1000)
+print "Total duration: %d min" % (duration / 60)
