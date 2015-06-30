@@ -19,12 +19,6 @@ distance = 0
 
 for track in gpx.tracks:
     for segment in track.segments:
-        for point in segment.points:
-            this_point = Point(point.latitude, point.longitude)
-            try:
-                distance += vincenty(last_point, this_point).meters
-            except NameError:
-                None
-            last_point = this_point
+        distance += segment.length_2d()
 
 print "Total distance: %.1f km" % (distance / 1000)
