@@ -4,6 +4,7 @@ import sys
 import os
 import re
 from datetime import timedelta
+import calendar
 
 import gpxpy
 
@@ -56,7 +57,7 @@ def run(gpx_files):
     for gpx_file in gpx_files:
         try:
             start_date, distance = distance_for(gpx_file)
-            month = "%4d-%02d" % (start_date.year, start_date.month)
+            month = "%4d %s" % (start_date.year, calendar.month_name[start_date.month])
             if not totals.has_key(month):
                 totals[month] = {}
             sport = guess_sport(gpx_file)
