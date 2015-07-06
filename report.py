@@ -39,10 +39,12 @@ def guess_sport(filename):
     '''
     decide if this is cycling or running
     '''
-    if re.compile("Cycling").search(filename):
+    if re.compile("Cycling|Ride").search(filename):
         return "Cycling"
-    if re.compile("Running").search(filename):
+    if re.compile("Run(ning)?").search(filename):
         return "Running"
+    if re.compile("Walk").search(filename):
+        return "Walk"
     else:
         return "Unknown"
 
