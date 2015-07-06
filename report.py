@@ -80,10 +80,10 @@ def run(gpx_files):
             sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
     for month in sorted(totals):
-        sys.stderr.write("%s," % (month))
+        sys.stdout.write("%s," % (month))
         for sport in totals[month]:
-            sys.stderr.write("%s,%.1f," % (sport, totals[month][sport] / 1000))
-        sys.stderr.write("\n")
+            sys.stdout.write("%s,%.1f," % (sport, totals[month][sport] / 1000))
+        sys.stdout.write("\n")
 
 if __name__ == '__main__':
     run(sys.argv[1:])
