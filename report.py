@@ -1,70 +1,48 @@
 #! /usr/bin/env python
 
 import sys
-import os
 import re
 from datetime import timedelta
-import calendar
 
 import gpxpy
 
 from geopy.point import Point
 from geopy.distance import vincenty
 
-try:
-    filename = sys.argv[1]
-except IndexError as e:
-    print "Usage: %s: <filename>" % sys.argv[0]
-    sys.exit(1)
-
-
-def distance_for(f):
-    gpx = gpxpy.parse(open(f, 'r'))
-
-    date = gpx.tracks[0].segments[0].points[0].time + timedelta(hours=10) # yeah that's awesome Michael
-
-    distance = 0
-    duration = 0
-
-    for track in gpx.tracks:
-        for segment in track.segments:
-            distance += segment.length_2d()
-            duration += segment.get_duration()
-
-    return date, distance
-
 
 def guess_sport(filename):
     '''
     decide if this is cycling or running
     '''
-    if re.compile("Cycling|Ride").search(filename):
+    if re.search("Cycling|Ride", filename):
         return "Cycling"
-    if re.compile("Run(ning)?").search(filename):
+    if re.search("Run(ning)?", filename):
         return "Running"
-    if re.compile("Walk").search(filename):
+    if re.search("Walk", filename):
         return "Walking"
     else:
         return "Unknown"
 
-totals = {}
 
 def run(gpx_files):
     if not gpx_files:
         print('No GPX files given')
         sys.exit(1)
 
+    totals = {}
+
     for gpx_file in gpx_files:
         try:
-            start_date, distance = distance_for(gpx_file)
-            month = start_date.strftime('%Y %B')
             sport = guess_sport(gpx_file)
-            if not totals.has_key(month):
-                totals[month] = {}
-            if totals[month].has_key(sport):
-                totals[month][sport] += distance
+            gpx = gpxpy.parse(open(gpx_file, 'r'))
+            start_date = gpx.get_time_bounds()[0] + timedelta(hours=10) # hope I never run/ride outside AEST
+            month_key = start_date.strftime('%Y-%m')
+            if not totals.has_key(month_key):
+                totals[month_key] = {}
+            if totals[month_key].has_key(sport):
+                totals[month_key][sport] += gpx.length_3d()
             else:
-                totals[month][sport] = distance
+                totals[month_key][sport] = gpx.length_3d()
         except Exception as e:
             sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
