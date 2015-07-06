@@ -20,7 +20,6 @@ def distance_for(f):
     gpx = gpxpy.parse(open(f, 'r'))
 
     date = gpx.tracks[0].segments[0].points[0].time + timedelta(hours=10) # yeah that's awesome Michael
-    # print "Processing %s ..." % date
 
     distance = 0
     duration = 0
@@ -30,8 +29,6 @@ def distance_for(f):
             distance += segment.length_2d()
             duration += segment.get_duration()
 
-    # print "Total distance: %.1f km" % (distance / 1000)
-    # print "Total duration: %d min" % (duration / 60)
     return distance
 
 
