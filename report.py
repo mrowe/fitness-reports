@@ -35,6 +35,8 @@ def run(gpx_files):
         try:
             sport = guess_sport(gpx_file)
             gpx = gpxpy.parse(open(gpx_file, 'r'))
+            if len(gpx.tracks) == 0:
+                continue
             start_date = gpx.get_time_bounds()[0] + timedelta(hours=10) # hope I never run/ride outside AEST
             month_key = start_date.strftime('%Y-%m')
             if not totals.has_key(month_key):
