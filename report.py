@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 import sys
+import os
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import gpxpy
 
@@ -32,6 +33,18 @@ def distance_for(f):
     return distance
 
 
+def guess_date(filename):
+    '''
+    the filename should contain the (start) date
+    '''
+    date_string = re.search("(\d{4}-?\d{2}-?\d{2})", os.path.basename(filename)).group(0)
+    for date_format in ['%Y-%m-%d', '%Y%m%d']:
+        try:
+            return datetime.strptime(date_string, date_format)
+        except ValueError as e:
+            pass
+    return None
+
 def guess_sport(filename):
     '''
     decide if this is cycling or running
@@ -54,17 +67,23 @@ def run(gpx_files):
 
     for gpx_file in gpx_files:
         try:
+            start_date = guess_date(gpx_file)
+            month = "%4d-%02d" % (start_date.year, start_date.month)
+            if not totals.has_key(month):
+                totals[month] = {}
             sport = guess_sport(gpx_file)
-            if totals.has_key(sport):
-                totals[sport] += distance_for(gpx_file)
+            if totals[month].has_key(sport):
+                totals[month][sport] += distance_for(gpx_file)
             else:
-                totals[sport] = distance_for(gpx_file)
+                totals[month][sport] = distance_for(gpx_file)
         except Exception as e:
-            print('Error processing %s: %s' % (gpx_file, e))
-            sys.exit(1)
+            sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
-    for sport in totals:
-        print "%s: %.1f km" % (sport, totals[sport] / 1000)
+    for month in sorted(totals):
+        sys.stderr.write("%s," % (month))
+        for sport in totals[month]:
+            sys.stderr.write("%s,%.1f," % (sport, totals[month][sport] / 1000))
+        sys.stderr.write("\n")
 
 if __name__ == '__main__':
     run(sys.argv[1:])
