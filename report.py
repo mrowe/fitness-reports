@@ -3,7 +3,7 @@
 import sys
 import os
 import re
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 import gpxpy
 
@@ -30,20 +30,8 @@ def distance_for(f):
             distance += segment.length_2d()
             duration += segment.get_duration()
 
-    return distance
+    return date, distance
 
-
-def guess_date(filename):
-    '''
-    the filename should contain the (start) date
-    '''
-    date_string = re.search("(\d{4}-?\d{2}-?\d{2})", os.path.basename(filename)).group(0)
-    for date_format in ['%Y-%m-%d', '%Y%m%d']:
-        try:
-            return datetime.strptime(date_string, date_format)
-        except ValueError as e:
-            pass
-    return None
 
 def guess_sport(filename):
     '''
@@ -67,15 +55,15 @@ def run(gpx_files):
 
     for gpx_file in gpx_files:
         try:
-            start_date = guess_date(gpx_file)
+            start_date, distance = distance_for(gpx_file)
             month = "%4d-%02d" % (start_date.year, start_date.month)
             if not totals.has_key(month):
                 totals[month] = {}
             sport = guess_sport(gpx_file)
             if totals[month].has_key(sport):
-                totals[month][sport] += distance_for(gpx_file)
+                totals[month][sport] += distance
             else:
-                totals[month][sport] = distance_for(gpx_file)
+                totals[month][sport] = distance
         except Exception as e:
             sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
