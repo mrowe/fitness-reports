@@ -6,9 +6,6 @@ from datetime import timedelta
 
 import gpxpy
 
-from geopy.point import Point
-from geopy.distance import vincenty
-
 
 def guess_sport(filename):
     '''
