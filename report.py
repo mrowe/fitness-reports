@@ -43,7 +43,7 @@ def guess_sport(filename):
     if re.compile("Run(ning)?").search(filename):
         return "Running"
     if re.compile("Walk").search(filename):
-        return "Walk"
+        return "Walking"
     else:
         return "Unknown"
 
