@@ -57,10 +57,10 @@ def run(gpx_files):
     for gpx_file in gpx_files:
         try:
             start_date, distance = distance_for(gpx_file)
-            month = "%4d %s" % (start_date.year, calendar.month_name[start_date.month])
+            month = start_date.strftime('%Y %B')
+            sport = guess_sport(gpx_file)
             if not totals.has_key(month):
                 totals[month] = {}
-            sport = guess_sport(gpx_file)
             if totals[month].has_key(sport):
                 totals[month][sport] += distance
             else:
