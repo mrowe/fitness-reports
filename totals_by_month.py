@@ -5,6 +5,8 @@ import string
 import re
 from datetime import timedelta
 
+import csv
+
 import gpxpy
 
 
@@ -47,17 +49,17 @@ def run(gpx_files):
             sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
     sports = sorted(set([sport for total in totals.itervalues() for sport in total.iterkeys()]))
-    sys.stdout.write("month,%s\n" % string.join(sports, ","))
 
-    for month in sorted(totals):
-        sys.stdout.write(month)
-        for sport in sports:
-            if totals[month].has_key(sport):
-                total = totals[month][sport] / 1000
-            else:
-                total = 0
-            sys.stdout.write(",%.1f" % (total))
-        sys.stdout.write("\n")
+    with open('totals.csv', 'w') as csvfile:
+        fields = ["month"]
+        fields.extend(sports)
+        writer = csv.DictWriter(csvfile, fieldnames=fields)
+        writer.writeheader()
+
+        for month in sorted(totals):
+            row = totals[month]
+            row.update({"month": month})
+            writer.writerow(row)
 
 if __name__ == '__main__':
     run(sys.argv[1:])
