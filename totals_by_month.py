@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import sys
+import string
 import re
 from datetime import timedelta
 
@@ -45,10 +46,17 @@ def run(gpx_files):
         except Exception as e:
             sys.stderr.write('Error processing %s: %s\n' % (gpx_file, e))
 
+    sports = sorted(set([sport for total in totals.itervalues() for sport in total.iterkeys()]))
+    sys.stdout.write("month,%s\n" % string.join(sports, ","))
+
     for month in sorted(totals):
-        sys.stdout.write("%s," % (month))
-        for sport in totals[month]:
-            sys.stdout.write("%s,%.1f," % (sport, totals[month][sport] / 1000))
+        sys.stdout.write(month)
+        for sport in sports:
+            if totals[month].has_key(sport):
+                total = totals[month][sport] / 1000
+            else:
+                total = 0
+            sys.stdout.write(",%.1f" % (total))
         sys.stdout.write("\n")
 
 if __name__ == '__main__':
